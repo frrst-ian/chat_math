@@ -12,14 +12,3 @@ app.add_middleware(
 )
 
 app.mount("/videos", StaticFiles(directory="videos"), name="videos")
-
-
-@app.get("/")
-def health():
-    return {"message": "ChatMath API is runningg"}
-
-
-
-@app.get("/hello/{name}")
-def hello(name):
-    return {"message": "hello {name}"}
