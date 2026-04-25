@@ -17,6 +17,7 @@ async def chat(payload: ChatRequest, background_tasks: BackgroundTasks):
     job_id = str(uuid4())
     jobs[job_id] = {"status": "pending",
                     "video_url": None, "explanation": None}
+    # run a background task after returning job_id
     background_tasks.add_task(run_job, job_id, payload.topic)
     return {"job_id": job_id}
 
@@ -26,6 +27,7 @@ async def run_job(job_id: str, topic: str):
         jobs[job_id]["status"] = "rendering"
 
         cached = video_exists(topic)
+        # return pre cache video 
         if cached:
             video_path = cached
         else:

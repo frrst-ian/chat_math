@@ -27,3 +27,13 @@ def generate_explanation(topic: str) -> str:
     )
 
     return response.choices[0].message.content
+
+def fix_manim_script(script: str, error: str) -> str:
+    response = litellm.completion(
+        model=os.getenv("LLM_MODEL", "groq/llama-3.3-70b-versatile"),
+        messages=[
+            {"role": "system", "content": MANIM_SCRIPT_GENERATION_PROMPT},
+            {"role": "user", "content": f"This script failed with error:\n{error}\n\nFix it:\n{script}"}
+        ]
+    )
+    return response.choices[0].message.content
