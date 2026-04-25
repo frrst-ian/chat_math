@@ -2,31 +2,32 @@ import litellm
 import os
 from dotenv import load_dotenv
 from services.prompts import MANIM_SCRIPT_GENERATION_PROMPT, TOPIC_EXPLANATION_PROMPT, CLASSIFIER_PROMPT
+from services import rag
 
 load_dotenv()
 
 
 def generate_manim_script(topic: str) -> str:
-    # TODO: classify input, inject RAG context for topics
     response = litellm.completion(
-        model=os.getenv("LLM_MODEL",  "groq/llama-3.3-70b-versatile"),
+        model=os.getenv("LLM_MODEL", "groq/llama-3.3-70b-versatile"),
         messages=[
             {"role": "system", "content": MANIM_SCRIPT_GENERATION_PROMPT},
-            {"role": "user",  "content": f"Topic: {topic}"}
+            {"role": "user", "content": f"Topic: {topic}"}
         ]
     )
     return response.choices[0].message.content
 
 
 def generate_explanation(topic: str) -> str:
+    context = rag.query(topic)
+    prompt = TOPIC_EXPLANATION_PROMPT.format(context=context or "No curriculum context available.")
     response = litellm.completion(
-        model=os.getenv("LLM_MODEL",  "groq/llama-3.3-70b-versatile"),
+        model=os.getenv("LLM_MODEL", "groq/llama-3.3-70b-versatile"),
         messages=[
-            {"role": "system", "content": TOPIC_EXPLANATION_PROMPT},
-            {"role": "user", "content": f"Topic {topic}"}
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": f"Topic: {topic}"}
         ]
     )
-
     return response.choices[0].message.content
 
 

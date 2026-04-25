@@ -2,3 +2,7 @@ fastapi
 uvicorn
 litellm
 python-dotenv
+chromadb
+pypdf
+pytest
+ 
