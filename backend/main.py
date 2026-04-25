@@ -1,12 +1,13 @@
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from routers import chat, jobs
+from routers import chat, jobs, topics
 
 app = FastAPI()
 
 app.include_router(chat.router)
 app.include_router(jobs.router)
+app.include_router(topics.router)
 
 
 app.add_middleware(
