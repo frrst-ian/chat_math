@@ -6,12 +6,10 @@ from services.manim_runner import run_manim, video_exists
 from services.llm import generate_manim_script, generate_explanation
 import asyncio
 
+from models.chat_model import ChatRequest
+
 
 router = APIRouter(prefix="/api/chat", tags=["post"])
-
-
-class ChatRequest(BaseModel):
-    topic: str
 
 
 @router.post("")
@@ -31,15 +29,18 @@ async def run_job(job_id: str, topic: str):
         cached = video_exists(topic)
         if cached:
             # already rendered before, wrap in a task
-            render_task = asyncio.create_task(asyncio.to_thread(lambda: cached))
+            render_task = asyncio.create_task(
+                asyncio.to_thread(lambda: cached))
         else:
             # generate script first
             script = await asyncio.to_thread(generate_manim_script, topic)
             # kick off render in background thread without waiting
-            render_task = asyncio.create_task(asyncio.to_thread(run_manim, script, topic))
+            render_task = asyncio.create_task(
+                asyncio.to_thread(run_manim, script, topic))
 
-        # kick off explanation at the same time as render 
-        explain_task = asyncio.create_task(asyncio.to_thread(generate_explanation, topic))
+        # kick off explanation at the same time as render
+        explain_task = asyncio.create_task(
+            asyncio.to_thread(generate_explanation, topic))
 
         # save explanation immediately
         explanation = await explain_task

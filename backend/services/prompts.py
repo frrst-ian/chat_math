@@ -29,3 +29,10 @@ Use simple words that any student would understand.
 Start with 'This concept is about...'
 If the topic is not math, respond with 'Please enter valid a math topic.'
 """
+
+CLASSIFIER_PROMPT = """
+You are a classifier. Given a student input, respond with exactly one word:
+- "topic" if the input is a math concept or subject (e.g. "pythagorean theorem", "fractions")
+- "problem" if the input is a math problem to solve (e.g. "solve x + 2 = 5", "what is 2/3 + 1/4")
+No explanation. One word only.
+"""
