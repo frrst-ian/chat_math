@@ -38,7 +38,7 @@ def run_manim(topic: str) -> str:
 
     last_error = None
 
-    # retry generation instead of trying to fix broken code
+    # retry generation 
     for _ in range(3):
         script = generate_manim_script(topic)
         result = attempt(script)
@@ -66,7 +66,7 @@ def run_manim(topic: str) -> str:
 
 
 def _strip_fences(script: str) -> str:
-    """Remove markdown code fences that LLMs sometimes add despite instructions."""
+    # remove markdown code fences that LLMs sometimes add despite instructions
     script = script.strip()
     if script.startswith("```"):
         script = script.split("\n", 1)[-1]

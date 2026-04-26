@@ -1,7 +1,7 @@
 import litellm
 import os
 from dotenv import load_dotenv
-from services.prompts import MANIM_SCRIPT_GENERATION_PROMPT, TOPIC_EXPLANATION_PROMPT, CLASSIFIER_PROMPT, JSON_PLAN_PROMPT, TEMPLATE
+from services.prompts import MANIM_SCRIPT_GENERATION_PROMPT, TOPIC_EXPLANATION_PROMPT, CLASSIFIER_PROMPT, JSON_PLAN_PROMPT
 from services import rag
 import re
 import json
@@ -11,7 +11,7 @@ load_dotenv()
 
 def generate_plan(topic: str) -> dict:
     response = litellm.completion(
-        model=os.getenv("LLM_MODEL", "groq/llama-3.3-70b-versatile"),
+        model=os.getenv("LLM_MODEL"),
         messages=[
             {"role": "system", "content": JSON_PLAN_PROMPT},
             {"role": "user", "content": topic}
@@ -29,6 +29,7 @@ def generate_plan(topic: str) -> dict:
 
 
 def generate_manim_script(topic: str, retries: int = 2) -> str:
+    last_error = ValueError("No attempts made")
     for _ in range(retries):
         try:
             plan = generate_plan(topic)
@@ -36,10 +37,11 @@ def generate_manim_script(topic: str, retries: int = 2) -> str:
                 continue
 
             response = litellm.completion(
-                model=os.getenv("LLM_MODEL", "groq/llama-3.3-70b-versatile"),
+                model=os.getenv("LLM_MODEL"),
                 messages=[
                     {"role": "system", "content": MANIM_SCRIPT_GENERATION_PROMPT},
-                    {"role": "user", "content": f"TEMPLATE:\n{TEMPLATE}\n\nPLAN:\n{plan}"}
+                    {"role": "user", "content": f"PLAN:\n{json.dumps(plan, indent=2)}"}
+
                 ],
             )
 
@@ -56,7 +58,7 @@ def generate_explanation(topic: str) -> str:
     prompt = TOPIC_EXPLANATION_PROMPT.format(
         context=context or "No curriculum context available.")
     response = litellm.completion(
-        model=os.getenv("LLM_MODEL", "groq/llama-3.3-70b-versatile"),
+        model=os.getenv("LLM_MODEL"),
         messages=[
             {"role": "system", "content": prompt},
             {"role": "user", "content": f"Topic: {topic}"}
@@ -76,7 +78,7 @@ def is_valid_plan(plan: dict) -> bool:
 
 def classify_input(topic: str) -> str:
     response = litellm.completion(
-        model=os.getenv("LLM_MODEL", "groq/llama-3.3-70b-versatile"),
+        model=os.getenv("LLM_MODEL"),
         messages=[
             {"role": "system", "content": CLASSIFIER_PROMPT},
             {"role": "user", "content": topic}

@@ -46,6 +46,8 @@ async def run_job(job_id: str, topic: str):
 
         # wait for the slow render to finish
         video_path = await render_task
+        print(f"[run_job] video_path={video_path}") 
         jobs[job_id].update({"status": "done", "video_url": f"/{video_path}"})
     except Exception as e:
         jobs[job_id].update({"status": "failed", "error": str(e)})
+        print(f"[run_job] FAILED: {e}") 
