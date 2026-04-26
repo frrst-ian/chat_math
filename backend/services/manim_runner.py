@@ -2,7 +2,7 @@ import subprocess
 import hashlib
 import os
 import tempfile
-from services.llm import generate_manim_script, fix_manim_script
+from services.llm import generate_manim_script
 
 
 def topic_hash(topic: str) -> str:
@@ -15,32 +15,61 @@ def video_exists(topic: str) -> str | None:
     return path if os.path.exists(path) else None
 
 
-def run_manim(script: str, topic: str) -> str:
+def run_manim(topic: str) -> str:
     script_path = os.path.join(tempfile.gettempdir(), f"{topic_hash(topic)}.py")
-    media_dir = os.path.join(tempfile.gettempdir(), "media")
+    media_dir = os.path.join(tempfile.gettempdir(), f"media_{topic_hash(topic)}")
+
+    os.makedirs(media_dir, exist_ok=True)
 
     def attempt(s: str) -> subprocess.CompletedProcess:
+        s = _strip_fences(s)
+
         with open(script_path, "w") as f:
             f.write(s)
-            
+
         # kill after 180s so a broken script doesn't hang on the server
         return subprocess.run(
-            ["manim", "-ql", script_path, "ExplainScene", "--media_dir", media_dir],
-            capture_output=True, text=True, timeout=180
+            ["manim", "-ql", script_path, "VisualizationScene",
+                "--media_dir", media_dir],
+            capture_output=True,
+            text=True,
+            timeout=180
         )
 
-    result = attempt(script)
-    # if the script fails, regenerate the script 
-    if result.returncode != 0:
-        fixed = fix_manim_script(script, result.stderr)
-        result = attempt(fixed)
+    last_error = None
 
-    if result.returncode != 0:
-        raise RuntimeError(result.stderr)
+    # retry generation instead of trying to fix broken code
+    for _ in range(3):
+        script = generate_manim_script(topic)
+        result = attempt(script)
 
-    output_path = f"videos/{topic_hash(topic)}.mp4"
-    os.rename(
-        os.path.join(media_dir, "videos", topic_hash(topic), "480p15", "ExplainScene.mp4"),
-        output_path
-    )
-    return output_path
+        if result.returncode == 0:
+            output_path = f"videos/{topic_hash(topic)}.mp4"
+
+            src = os.path.join(
+                media_dir,
+                "videos",
+                topic_hash(topic),
+                "480p15",
+                "VisualizationScene.mp4"
+            )
+
+            if not os.path.exists(src):
+                raise RuntimeError("Manim finished but output video not found")
+
+            os.rename(src, output_path)
+            return output_path
+
+        last_error = result.stderr
+
+    raise RuntimeError(last_error)
+
+
+def _strip_fences(script: str) -> str:
+    """Remove markdown code fences that LLMs sometimes add despite instructions."""
+    script = script.strip()
+    if script.startswith("```"):
+        script = script.split("\n", 1)[-1]
+    if script.endswith("```"):
+        script = script.rsplit("\n", 1)[0]
+    return script.strip()
