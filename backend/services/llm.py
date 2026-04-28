@@ -1,7 +1,7 @@
 import litellm
 import os
 from dotenv import load_dotenv
-from services.prompts import MANIM_SCRIPT_GENERATION_PROMPT, TOPIC_EXPLANATION_PROMPT, CLASSIFIER_PROMPT, JSON_PLAN_PROMPT
+from services.prompts import MANIM_SCRIPT_GENERATION_PROMPT, TOPIC_EXPLANATION_PROMPT, CLASSIFIER_PROMPT, JSON_PLAN_PROMPT, PROBLEM_EXPLANATION_PROMPT
 from services import rag
 import re
 import json
@@ -53,15 +53,18 @@ def generate_manim_script(topic: str, retries: int = 2) -> str:
     raise ValueError(f"Failed to generate valid Manim script: {last_error}")
 
 
-def generate_explanation(topic: str) -> str:
+def generate_explanation(topic: str, input_type: str = "topic") -> str:
     context = rag.query(topic)
-    prompt = TOPIC_EXPLANATION_PROMPT.format(
-        context=context or "No curriculum context available.")
+    if input_type == "problem":
+        prompt = PROBLEM_EXPLANATION_PROMPT
+    else:
+        prompt = TOPIC_EXPLANATION_PROMPT.format(
+            context=context or "No curriculum context available.")
     response = litellm.completion(
         model=os.getenv("LLM_MODEL"),
         messages=[
             {"role": "system", "content": prompt},
-            {"role": "user", "content": f"Topic: {topic}"}
+            {"role": "user", "content": topic}
         ],
     )
     return response.choices[0].message.content

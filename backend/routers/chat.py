@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from uuid import uuid4
 from store import jobs
 from services.manim_runner import run_manim, video_exists
-from services.llm import generate_explanation
+from services.llm import generate_explanation, classify_input
 import asyncio
 
 from models.chat_model import ChatRequest
@@ -37,8 +37,9 @@ async def run_job(job_id: str, topic: str):
                 asyncio.to_thread(run_manim, topic))
 
         # kick off explanation at the same time as render
+        input_type = classify_input(topic)
         explain_task = asyncio.create_task(
-            asyncio.to_thread(generate_explanation, topic))
+            asyncio.to_thread(generate_explanation, topic, input_type))
 
         # save explanation immediately
         explanation = await explain_task
