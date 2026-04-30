@@ -1,9 +1,105 @@
+/* 1. Use a more-intuitive box-sizing model */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* 2. Remove default margin */
+* {
+    margin: 0;
+}
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        interpolate-size: allow-keywords;
+    }
+}
+
+body {
+    /* 4. Add accessible line-height */
+    line-height: 1.5;
+    /* 5. Improve text rendering */
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 6. Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+/* 7. Inherit fonts for form controls */
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+/* 8. Avoid text overflows */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    overflow-wrap: break-word;
+}
+
+/* 9. Improve line wrapping */
+p {
+    text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-wrap: balance;
+}
+
+/*
+  10. Create a root stacking context
+*/
+#root,
+#__next {
+    isolation: isolate;
+}
+
+/* :root {
+  --text: #e4eaeb;
+  --text2: #c1bed1;
+  --text-sidebar: #8391ac;
+  --background: #1e212d;
+  --s-background: #111419;
+  --hover-bg: #292f3b;
+  --primary: #306fdc;
+  --secondary: #6d48c4;
+  --accent: #ef517a;
+  --sidebar-item-bg: #243a5f;
+  --sidebar-color: #5c73f6;
+  --sidebar-hover: #292f45;
+  --c-color: #b2c2d6;
+  --c-color2: #5067e9;
+} */
+
 :root {
     --text: #e4fafd;
-    --background: #26282D;
-    --background-2: #18181B;
-    --primary: #097FF6;
+    --background: #26282d;
+    --background-2: #18181b;
+    --primary: #097ff6;
     --secondary: #9d093d;
     --accent: #3d7add;
-    --accent-2: #0D3043;
+    --accent-2: #0d3043;
+
+    --navitem-bg: #3f434b;
+    --navitem-h: #31343a;
 }
