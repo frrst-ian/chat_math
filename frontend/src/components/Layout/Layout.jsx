@@ -5,9 +5,18 @@ import { Outlet } from "react-router-dom";
 export default function Layout() {
     const [open, setOpen] = useState(false);
     return (
-        <div className="app">
+        <div style={{ display: "flex", minHeight: "100vh" }}>
             <Sidebar open={open} setOpen={setOpen} />
-            <div className="main" style={{ paddingLeft: open ? "200px" : "60px" }}>
+            <div
+                style={{
+                    flex: 1,
+                    marginLeft: open ? "200px" : "60px",
+                    transition: "margin-left 0.22s ease",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
                 <Outlet />
             </div>
         </div>
