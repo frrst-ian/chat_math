@@ -34,6 +34,13 @@ export function useChat() {
         }
     }, []);
 
+     const cancel = useCallback(() => {
+        clearInterval(intervalRef.current);
+        setStatus(null);
+        setIsExplaining(false);
+        setJobId(null);
+    }, []);
+
     useEffect(() => {
         if (!jobId || status === "done" || status === "failed") return;
 
@@ -63,6 +70,7 @@ export function useChat() {
                             "ai",
                             "Couldn't generate the animation. Try a different topic.",
                         );
+                        setIsExplaining(false);
                     }
                 }
             } catch {
@@ -73,5 +81,5 @@ export function useChat() {
         return () => clearInterval(intervalRef.current);
     }, [jobId]);
 
-    return { messages, status, videoUrl, mode, setMode, submit, isExplaining };
+    return { messages, status, videoUrl, mode, setMode, submit, isExplaining, cancel };
 }

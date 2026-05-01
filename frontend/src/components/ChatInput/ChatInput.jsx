@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Square } from "lucide-react";
 import styles from "./ChatInput.module.css";
 
-export default function ChatInput({ onSubmit, disabled }) {
+export default function ChatInput({ onSubmit, onCancel, disabled,isLoading }) {
     const [value, setValue] = useState("");
 
     const handleSubmit = () => {
@@ -28,14 +28,24 @@ export default function ChatInput({ onSubmit, disabled }) {
                 onKeyDown={handleKey}
                 disabled={disabled}
             />
-            <button
-                className={styles.sendBtn}
-                onClick={handleSubmit}
-                disabled={disabled || !value.trim()}
-                aria-label="Send"
-            >
-                <ArrowUp size={18} strokeWidth={2} />
-            </button>
+            {isLoading ? (
+                <button
+                    className={styles.cancelBtn}
+                    onClick={onCancel}
+                    aria-label="Cancel"
+                >
+                    <Square size={14} strokeWidth={2} fill="currentColor" />
+                </button>
+            ) : (
+                <button
+                    className={styles.sendBtn}
+                    onClick={handleSubmit}
+                    disabled={!value.trim()}
+                    aria-label="Send"
+                >
+                    <ArrowUp size={18} strokeWidth={2} />
+                </button>
+            )}
         </div>
     );
 }

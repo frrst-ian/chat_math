@@ -45,3 +45,18 @@
     opacity: 0.4;
     cursor: not-allowed;
 }
+
+.cancelBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: #3a1a1a;
+    color: #ef4444;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}

@@ -6,7 +6,7 @@ const QUICK_TOPICS = [
         query: "Can you explain how the number line works?",
     },
     { label: "Sets", query: "I want to understand sets." },
-    { label: "Fractions", query: "What is 1/2 + 1/3?" },
+    { label: "Adding Fractions", query: "What is 1/2 + 1/3?" },
     { label: "Linear Equations", query: "Solve 2x + 3 = 7. Show me first how it's solved graphically and then give me the solution mathematically." },
 ];
 

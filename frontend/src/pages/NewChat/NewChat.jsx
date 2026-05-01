@@ -8,7 +8,7 @@ import VideoPlayer from "../../components/VideoPlayer/VideoPlayer";
 import styles from "./NewChat.module.css";
 
 export default function NewChat() {
-    const { messages, status, videoUrl, mode, setMode, submit, isExplaining } = useChat();
+    const { messages, status, videoUrl, mode, setMode, submit, isExplaining, cancel } = useChat();
     const bottomRef = useRef(null);
     const isLoading = status === "pending" || status === "rendering";
     const isEmpty = messages.length === 0;
@@ -27,7 +27,7 @@ export default function NewChat() {
                 <div className={styles.emptyState}>
                     <div className={styles.inputArea}>
                         <TopicPills onSelect={submit} />
-                        <ChatInput onSubmit={submit} disabled={isLoading} />
+                        <ChatInput onSubmit={submit} onCancel={cancel} disabled={isLoading} isLoading={isLoading} />
                     </div>
                 </div>
             ) : (
@@ -40,7 +40,7 @@ export default function NewChat() {
                         <div ref={bottomRef} />
                     </div>
                     <div className={styles.inputArea}>
-                        <ChatInput onSubmit={submit} disabled={isLoading} />
+                       <ChatInput onSubmit={submit} onCancel={cancel} disabled={isLoading} isLoading={isLoading} />
                     </div>
                 </div>
             )}

@@ -9,17 +9,18 @@ Zones:
   FOOTER BAR:         y = -3.6, x in [-6.5, 6.5]
 
 Font sizes — no other values allowed:
-  scene_title  = 28
-  step_title   = 22
-  caption      = 18
-  footer       = 20
-  visual_label = 22
+  scene_title  = 32
+  step_title   = 24
+  caption      = 20
+  footer       = 24
+  visual_label = 24
 
 Right zone hard rules:
   - step_title centered horizontally in the right zone (center x = 3.3), anchored at y = 1.8
   - caption VGroup anchored at (0.8, 0.8), aligned LEFT
   - Max 6 words per caption line
   - Max 2 caption lines
+  - Caption text must never contain &, <, or > characters — use words only (e.g. "less than" not "<")
   - Nothing in the right zone may have x > 5.8
 
 Pacing rules — every step must follow this exact sequence:
@@ -44,16 +45,22 @@ TEXT_COLOR = "#FFFFFF"
 FOOTER_BG  = "#1A1F2E"
 
 def make_title(text):
-    return Text(text, font_size=28, color=TEXT_COLOR).to_edge(UP, buff=0.3)
+    return MarkupText(
+        f'<span letter_spacing="800">{text}</span>',
+        font_size=32, color=TEXT_COLOR, weight=BOLD
+    ).to_edge(UP, buff=0.3)
 
 def make_step_title(text):
-    return Text(text, font_size=22, weight=BOLD, color=PRIMARY).move_to([3.3, 1.8, 0])
+    return MarkupText(
+        f'<span letter_spacing="600">{text}</span>',
+        font_size=24, weight=BOLD, color=PRIMARY
+    ).move_to([3.3, 1.8, 0])
 
 def make_caption(line1, line2=""):
-    t1 = Text(line1, font_size=18, color=TEXT_COLOR)
+    t1 = MarkupText(f'<span letter_spacing="400">{line1}</span>', font_size=20, color=TEXT_COLOR)
     if line2:
-        t2 = Text(line2, font_size=18, color=TEXT_COLOR)
-        group = VGroup(t1, t2).arrange(DOWN, aligned_edge=LEFT, buff=0.45)
+        t2 = MarkupText(f'<span letter_spacing="400">{line2}</span>', font_size=20, color=TEXT_COLOR)
+        group = VGroup(t1, t2).arrange(DOWN, aligned_edge=LEFT, buff=0.55)
     else:
         group = VGroup(t1)
     group.move_to([3.3, 0.2, 0])
@@ -61,10 +68,10 @@ def make_caption(line1, line2=""):
 
 def make_footer(tex_string):
     bg = Rectangle(
-        width=14, height=0.75,
+        width=14, height=0.95,
         fill_color=FOOTER_BG, fill_opacity=0.95, stroke_width=0
     ).move_to([0, -3.6, 0])
-    label = MathTex(tex_string, font_size=20, color=SECONDARY).move_to([0, -3.6, 0])
+    label = MathTex(tex_string, font_size=24, color=SECONDARY).move_to([0, -3.6, 0])
     return VGroup(bg, label)
 """
 
@@ -84,6 +91,23 @@ Rules:
 - Visuals must be creative and engaging — use color (PRIMARY, SECONDARY, ACCENT), vary shapes, add labeled Dots, Arrows, or Braces to highlight key parts. Avoid bare white outlines on black. Every visual should look like it belongs in a polished textbook.
 - One idea per step only.
 - If input is not math, output: {"type": "invalid"}
+
+FRACTION PROBLEMS — special rules:
+  - Always use MathTex for fractions: MathTex(r"\\frac{1}{2} + \\frac{1}{3} = \\frac{5}{6}", font_size=48)
+  - Show each fraction separately first, then combine — one MathTex object per step
+  - Use colored Rectangle strips to visualize fraction parts (e.g., a Rectangle divided into equal sections with some filled in ACCENT color)
+  - Never use plain Text() to render fractions
+
+GRAPHING PROBLEMS — special rules:
+  - Use Axes with explicit x_range, y_range, and axis_config. Example:
+      axes = Axes(x_range=[-1, 5, 1], y_range=[-1, 9, 1], x_length=6, y_length=5,
+                  axis_config={"include_numbers": True, "font_size": 18})
+  - Always add axis labels: axes.get_x_axis_label("x"), axes.get_y_axis_label("y")
+  - Plot lines/curves with axes.plot(lambda x: 2*x + 3, color=PRIMARY)
+  - Mark key points with Dot(axes.c2p(x, y), color=SECONDARY, radius=0.12) + labeled MathTex nearby
+  - Keep axes fully within LEFT VISUAL ZONE — use x_length=5.0, y_length=4.0 max, and always position with .move_to([-3.5, -0.3, 0])
+  - NEVER place MathTex or Text on top of the Axes — all equation steps go in the RIGHT TEXT ZONE only, using make_step_title() and make_caption()
+  - Do not animate intermediate algebra steps as floating MathTex in the left zone — the graph is the only visual; equations belong in the footer or right zone
 
 Allowed visuals — Manim primitives only:
   2D:   Circle, Square, Rectangle, Triangle, Polygon, Ellipse, Arc,
@@ -128,7 +152,7 @@ If scene_type is "2d": inherit from Scene.
 Allowed objects:
   2D:  Circle, Square, Rectangle, Triangle, Polygon, Ellipse, Arc, Line, Arrow,
        DashedLine, Dot, NumberLine, Axes, MathTex, Text, VGroup,
-       SurroundingRectangle, Brace, BraceBetweenPoints
+       SurroundingRectangle, Brace, BraceBetweenPoints, MarkupText
   3D:  Sphere, Cube, Cylinder, Cone, Prism, Torus, Surface
 
 Never use: ImageMobject, SVGMobject, any external file.
@@ -146,6 +170,8 @@ Hard rules:
 - Never animate a bare list — always VGroup
 - Never use self.mobjects
 - Follow the pacing rules exactly — self.wait(4.0) after every step
+- FRACTION RULE: always render fractions with MathTex, never Text(). Use font_size=48 or larger for fraction MathTex objects so they are clearly readable.
+- GRAPH RULE: when using Axes, always call .move_to([-3.0, -0.5, 0]) to center it in the LEFT VISUAL ZONE.
 - If type is "invalid": display Text("Please enter a valid math topic.", font_size=22, color=TEXT_COLOR).move_to(ORIGIN)
 - Never use word_gap, t2w, word_spacing, or any kwargs not in Manim Text() — invalid kwargs crash the render
 - ABSOLUTE RULE: The very first character of your output must be `f` (the start of `from manim import *`). 
@@ -153,39 +179,43 @@ Hard rules:
 """
 
 TOPIC_EXPLANATION_PROMPT = """
-You are a friendly math teacher for junior high students in Southeast Asia.
-Given a topic and curriculum context, write exactly 3 sentences in plain English.
+You are a friendly math teacher explaining to a junior high student.
+Given a topic, write a short explanation in plain, casual English.
 
-Sentence 1: a simple everyday hook any student anywhere would understand particularly students in asia.
-Sentence 2: connect that hook to the math concept
-Sentence 3: one reason why this matters in daily life
+Structure:
+- Start with a simple everyday hook any student anywhere would relate to
+- Connect that hook to the math concept naturally, like telling a short story
+- Explain what the concept actually is and how it works, simply
+- End with why it matters or where they'll see it in real life
 
 Rules:
-- Plain English
-- Max 15 words per sentence
-- Metric units only
-- No formulas, no procedures
-- Simple words a 13-year-old understands
-- If not a math topic: respond only with "Please enter a valid math topic."
+- 4 to 6 sentences total, flowing naturally like a teacher talking
+- Friendly and simple tone, not a textbook
+- Max 20 words per sentence
+- No formulas, no symbols, no LaTeX
+- No bullet points, no headers, no bold text
+- If the topic is not math: reply only with "Please enter a valid math topic."
 
 Curriculum context:
 {context}
 """
 
 PROBLEM_EXPLANATION_PROMPT = """
-You are a math tutor for junior high students in Southeast Asia.
-The user gave you a math problem. Solve it step by step, then explain why.
+You are a friendly math tutor for a junior high student.
+The user gave you a math problem. Solve it and explain it like a patient friend would.
 
-Format — exactly 3 sentences, plain English:
-Sentence 1: restate what is being asked in one simple phrase, then state the answer.
-Sentence 2: show the key calculation step (use numbers, not variables).
-Sentence 3: one sentence on why this method works.
+Structure:
+- Start by restating what the problem is asking in simple words
+- State the answer clearly and early
+- Walk through the key steps using actual numbers, not variables
+- End with a short reason why this method makes sense
 
 Rules:
+- 4 to 6 sentences total, flowing naturally
+- Friendly and simple tone, not a textbook
 - Max 20 words per sentence
 - No LaTeX, no markdown, no bullet points
-- Plain numbers only (e.g. "7 − 2 = 5", not "x - y")
-- Simple words a 13-year-old understands
+- Plain numbers and words only
 """
 
 CLASSIFIER_PROMPT = """
