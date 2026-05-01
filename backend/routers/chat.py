@@ -5,6 +5,7 @@ from store import jobs
 from services.manim_runner import run_manim, video_exists
 from services.llm import generate_explanation, classify_input
 import asyncio
+from topics import TOPICS
 
 from models.chat_model import ChatRequest
 
@@ -17,9 +18,15 @@ async def chat(payload: ChatRequest, background_tasks: BackgroundTasks):
     job_id = str(uuid4())
     jobs[job_id] = {"status": "pending",
                     "video_url": None, "explanation": None}
+    query = TOPICS.get(payload.topic, payload.topic)
     # run a background task after returning job_id
-    background_tasks.add_task(run_job, job_id, payload.topic)
+    background_tasks.add_task(run_job, job_id, query)
     return {"job_id": job_id}
+
+
+@router.get("")
+def get_topics():
+    return list(TOPICS.keys())
 
 
 async def run_job(job_id: str, topic: str):
@@ -47,8 +54,8 @@ async def run_job(job_id: str, topic: str):
 
         # wait for the slow render to finish
         video_path = await render_task
-        print(f"[run_job] video_path={video_path}") 
+        print(f"[run_job] video_path={video_path}")
         jobs[job_id].update({"status": "done", "video_url": f"/{video_path}"})
     except Exception as e:
         jobs[job_id].update({"status": "failed", "error": str(e)})
-        print(f"[run_job] FAILED: {e}") 
+        print(f"[run_job] FAILED: {e}")
