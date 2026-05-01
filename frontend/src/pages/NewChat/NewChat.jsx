@@ -8,7 +8,7 @@ import VideoPlayer from "../../components/VideoPlayer/VideoPlayer";
 import styles from "./NewChat.module.css";
 
 export default function NewChat() {
-    const { messages, status, videoUrl, mode, setMode, submit } = useChat();
+    const { messages, status, videoUrl, mode, setMode, submit, isExplaining } = useChat();
     const bottomRef = useRef(null);
     const isLoading = status === "pending" || status === "rendering";
     const isEmpty = messages.length === 0;
@@ -36,9 +36,7 @@ export default function NewChat() {
                         {messages.map((msg) => (
                             <ChatBubble key={msg.id} role={msg.role} content={msg.content} />
                         ))}
-                        {isLoading && messages[messages.length - 1]?.role === "user" && (
-                            <ChatBubble role="ai" content="Generating your animation…" />
-                        )}
+                        {isExplaining && <ChatBubble role="ai" content="Thinking…" />}
                         <div ref={bottomRef} />
                     </div>
                     <div className={styles.inputArea}>

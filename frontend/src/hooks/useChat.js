@@ -6,6 +6,7 @@ export function useChat() {
     const [jobId, setJobId] = useState(null);
     const [status, setStatus] = useState(null);
     const [videoUrl, setVideoUrl] = useState(null);
+    const [isExplaining, setIsExplaining] = useState(false);
     const [mode, setMode] = useState("chat");
     const intervalRef = useRef(null);
     const explanationAddedRef = useRef(false);
@@ -20,6 +21,7 @@ export function useChat() {
 
         addMessage("user", topic);
         setStatus("pending");
+        setIsExplaining(true);
         setVideoUrl(null);
 
         try {
@@ -28,6 +30,7 @@ export function useChat() {
         } catch {
             addMessage("ai", "Something went wrong. Please try again.");
             setStatus(null);
+            setIsExplaining(false);
         }
     }, []);
 
@@ -42,6 +45,11 @@ export function useChat() {
                 if (data.explanation && !explanationAddedRef.current) {
                     explanationAddedRef.current = true;
                     addMessage("ai", data.explanation);
+                    addMessage(
+                        "hint",
+                        "Switch to Video Mode to watch the animation.",
+                    );
+                    setIsExplaining(false);
                 }
 
                 if (data.video_url) {
@@ -65,5 +73,5 @@ export function useChat() {
         return () => clearInterval(intervalRef.current);
     }, [jobId]);
 
-    return { messages, status, videoUrl, mode, setMode, submit };
+    return { messages, status, videoUrl, mode, setMode, submit, isExplaining };
 }
