@@ -6,6 +6,8 @@ from services.manim_runner import run_manim, video_exists
 from services.llm import generate_explanation, classify_input
 import asyncio
 from topics import TOPICS
+from middleware.auth import verify_token
+from fastapi import Depends
 
 from models.chat_model import ChatRequest
 
@@ -14,7 +16,7 @@ router = APIRouter(prefix="/api/chat", tags=["post"])
 
 
 @router.post("")
-async def chat(payload: ChatRequest, background_tasks: BackgroundTasks):
+async def chat(payload: ChatRequest, background_tasks: BackgroundTasks, user=Depends(verify_token)):
     job_id = str(uuid4())
     jobs[job_id] = {"status": "pending",
                     "video_url": None, "explanation": None}
@@ -25,11 +27,11 @@ async def chat(payload: ChatRequest, background_tasks: BackgroundTasks):
 
 
 @router.get("")
-def get_topics():
+def get_topics(user=Depends(verify_token)):
     return list(TOPICS.keys())
 
 
-async def run_job(job_id: str, topic: str):
+async def run_job(job_id: str, topic: str, user=Depends(verify_token)):
     try:
         jobs[job_id]["status"] = "rendering"
 

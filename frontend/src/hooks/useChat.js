@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { startChat, pollJob } from "../helpers/api";
+import { useAuth } from "../context/AuthContext";
 
 export function useChat() {
     const [messages, setMessages] = useState([]);
@@ -10,6 +11,8 @@ export function useChat() {
     const [mode, setMode] = useState("chat");
     const intervalRef = useRef(null);
     const explanationAddedRef = useRef(false);
+
+    const {token} = useAuth()
 
     const addMessage = (role, content) =>
         setMessages((prev) => [...prev, { role, content, id: Date.now() }]);
@@ -25,14 +28,14 @@ export function useChat() {
         setVideoUrl(null);
 
         try {
-            const { job_id } = await startChat(topic.trim());
+            const { job_id } = await startChat(topic.trim(), token);
             setJobId(job_id);
         } catch {
             addMessage("ai", "Something went wrong. Please try again.");
             setStatus(null);
             setIsExplaining(false);
         }
-    }, []);
+    }, [token]);
 
      const cancel = useCallback(() => {
         clearInterval(intervalRef.current);
@@ -46,7 +49,7 @@ export function useChat() {
 
         intervalRef.current = setInterval(async () => {
             try {
-                const data = await pollJob(jobId);
+                const data = await pollJob(jobId, token);
                 setStatus(data.status);
 
                 if (data.explanation && !explanationAddedRef.current) {
