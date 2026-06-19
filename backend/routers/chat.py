@@ -8,6 +8,7 @@ import asyncio
 from topics import TOPICS
 from middleware.auth import verify_token
 from fastapi import Depends
+from services.curriculum_alert import log_query
 
 from models.chat_model import ChatRequest
 
@@ -22,7 +23,7 @@ async def chat(payload: ChatRequest, background_tasks: BackgroundTasks, user=Dep
                     "video_url": None, "explanation": None}
     query = TOPICS.get(payload.topic, payload.topic)
     # run a background task after returning job_id
-    background_tasks.add_task(run_job, job_id, query)
+    background_tasks.add_task(run_job, job_id, query,user["sub"])
     return {"job_id": job_id}
 
 
@@ -31,9 +32,11 @@ def get_topics(user=Depends(verify_token)):
     return list(TOPICS.keys())
 
 
-async def run_job(job_id: str, topic: str, user=Depends(verify_token)):
+async def run_job(job_id: str, topic: str, user_id: str):
     try:
         jobs[job_id]["status"] = "rendering"
+        log_query(topic, user_id) 
+
 
         cached = video_exists(topic)
         if cached:

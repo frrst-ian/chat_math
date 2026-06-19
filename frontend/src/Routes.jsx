@@ -2,14 +2,13 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import NewChat from "./pages/NewChat/NewChat";
 import Layout from "./components/Layout/Layout";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
-// import NotFound from "./components/NotFound/NotFound";
 import Auth from "./pages/Auth/Auth";
 import Settings from "./pages/Settings/Settings";
+import Recommendations from "./pages/Recommendations/Recommendations";
 
 const AppRoutes = () => {
     return (
         <Routes>
-            {/*<Route path="*" element={<NotFound />} />*/}
             <Route element={<Layout />}>
                 <Route
                     path="new-chat"
@@ -24,6 +23,15 @@ const AppRoutes = () => {
                     element={
                         <ProtectedRoute>
                             <Settings />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="recommendations"
+                    element={
+                        <ProtectedRoute>
+                            <Recommendations />
                         </ProtectedRoute>
                     }
                 />

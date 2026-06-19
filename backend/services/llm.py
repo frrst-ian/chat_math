@@ -9,47 +9,50 @@ import json
 load_dotenv()
 
 
+# Stage 1: Generate a structured JSON animation plan from a natural language topic
 def generate_plan(topic: str) -> dict:
     response = litellm.completion(
         model=os.getenv("LLM_MODEL"),
         messages=[
-            {"role": "system", "content": JSON_PLAN_PROMPT},
-            {"role": "user", "content": topic}
+            {"role": "system", "content": JSON_PLAN_PROMPT},  # System prompt that instructs Gemini to return a JSON blueprint
+            {"role": "user", "content": topic}                # Teacher's raw input (e.g. "explain the pythagorean theorem")
         ],
     )
-
     raw = response.choices[0].message.content
 
-    # extract JSON safely
+    # Extract JSON object from the response, ignoring any surrounding text
     match = re.search(r"\{.*\}", raw, re.DOTALL)
     if not match:
         raise ValueError("Invalid JSON plan")
-
     return json.loads(match.group(0))
 
 
+# Stage 2: Convert the JSON plan into executable Manim Python code
 def generate_manim_script(topic: str, retries: int = 2) -> str:
     last_error = ValueError("No attempts made")
-    for _ in range(retries):
+
+    for _ in range(retries):  # Retry up to 2 times on failure
         try:
-            plan = generate_plan(topic)
-            if not is_valid_plan(plan):
+            plan = generate_plan(topic)  # Run Stage 1 first
+
+            if not is_valid_plan(plan):  # Validate plan structure before proceeding
                 continue
 
             response = litellm.completion(
                 model=os.getenv("LLM_MODEL"),
                 messages=[
-                    {"role": "system", "content": MANIM_SCRIPT_GENERATION_PROMPT},
-                    {"role": "user", "content": f"PLAN:\n{json.dumps(plan, indent=2)}"}
-
+                    {"role": "system", "content": MANIM_SCRIPT_GENERATION_PROMPT},       # Instructs Gemini to write Manim code
+                    {"role": "user", "content": f"PLAN:\n{json.dumps(plan, indent=2)}"}  # Passes the JSON plan as input
                 ],
             )
 
+            # Strip markdown code fences (e.g. ```python) from the raw response
             return _strip_fences(response.choices[0].message.content)
 
         except Exception as e:
             last_error = e
-            continue
+            continue  # Retry on any exception
+
     raise ValueError(f"Failed to generate valid Manim script: {last_error}")
 
 

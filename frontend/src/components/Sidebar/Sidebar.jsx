@@ -6,23 +6,17 @@ import {
     MessagesSquare,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-// import { useAuth } from "../../context/AuthContext";
 import styles from "./Sidebar.module.css";
+import { Lightbulb } from "lucide-react";
 
 const NAV_ITEMS = [
     { icon: CirclePlus, label: "New chat", href: "/new-chat" },
     { icon: MessagesSquare, label: "Chats", href: "/chats" },
+    { icon: Lightbulb, label: "Recommendations", href: "/recommendations" },
 ];
 
 export default function Sidebar({ open, setOpen }) {
     const { pathname } = useLocation();
-    // const { user, logout } = useAuth();
-    // const navigate = useNavigate();
-
-    // const handleLogout = () => {
-    //     logout();
-    //     navigate("/");
-    // };
 
     return (
         <nav className={`${styles.sidebar} ${open ? styles.expanded : ""}`}>

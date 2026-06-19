@@ -1,13 +1,13 @@
 import chromadb
 
 CHROMA_DIR = "chroma_db"
-COLLECTION_NAME = "deped_math"
+COLLECTION_NAME = "math_data"
 
 _collection = None
 
 
 def _get_collection():
-    global _collection
+    global _collectionW
     if _collection is None:
         ef = chromadb.utils.embedding_functions.DefaultEmbeddingFunction()
         client = chromadb.PersistentClient(path=CHROMA_DIR)
@@ -17,7 +17,7 @@ def _get_collection():
 
 
 def query(topic: str, n_results: int = 3) -> str:
-    # Returns top-3 deped chunks relevant to topic
+    # Returns top-3 chunks relevant to topic
     try:
         results = _get_collection().query(
             query_texts=[topic], n_results=n_results)

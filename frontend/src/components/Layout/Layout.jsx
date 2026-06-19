@@ -10,7 +10,7 @@ export default function Layout() {
             <div
                 style={{
                     flex: 1,
-                    marginLeft: open ? "200px" : "60px",
+                    marginLeft: open ? "240px" : "60px",
                     transition: "margin-left 0.22s ease",
                     overflow: "hidden",
                     display: "flex",

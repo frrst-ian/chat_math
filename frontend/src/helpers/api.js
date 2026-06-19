@@ -1,3 +1,4 @@
+// frontend/src/helpers/api.js
 const BASE = import.meta.env.VITE_API_URL ?? "";
 
 const authHeaders = (token) => ({
@@ -21,3 +22,15 @@ export const getTopics = (token) =>
     fetch(`${BASE}/api/topics`, {
         headers: authHeaders(token),
     }).then((r) => r.json());
+
+export const getRecommendations = (token) =>
+    fetch(`${BASE}/api/recommendations`, {
+        headers: authHeaders(token),
+    }).then(r => r.json());
+
+export const generateRecommendation = (topic, token) =>
+    fetch(`${BASE}/api/recommendations/generate`, {
+        method: "POST",
+        headers: authHeaders(token),
+        body: JSON.stringify({ topic }),
+    }).then(r => r.json());
