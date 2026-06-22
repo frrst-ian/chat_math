@@ -2,6 +2,7 @@ import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./Routes";
 import { AuthProvider } from "./context/AuthContext";
 import "./styles/App.css";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
     return (
@@ -12,6 +13,7 @@ const App = () => {
                         <AppRoutes />
                     </div>
                 </div>
+                <Toaster position="bottom-center" />
             </BrowserRouter>
         </AuthProvider>
     );

@@ -8,7 +8,16 @@ import VideoPlayer from "../../components/VideoPlayer/VideoPlayer";
 import styles from "./NewChat.module.css";
 
 export default function NewChat() {
-    const { messages, status, videoUrl, mode, setMode, submit, isExplaining, cancel } = useChat();
+    const {
+        messages,
+        status,
+        videoUrl,
+        mode,
+        setMode,
+        submit,
+        isExplaining,
+        cancel,
+    } = useChat();
     const bottomRef = useRef(null);
     const isLoading = status === "pending" || status === "rendering";
     const isEmpty = messages.length === 0;
@@ -27,20 +36,36 @@ export default function NewChat() {
                 <div className={styles.emptyState}>
                     <div className={styles.inputArea}>
                         <TopicPills onSelect={submit} />
-                        <ChatInput onSubmit={submit} onCancel={cancel} disabled={isLoading} isLoading={isLoading} />
+                        <ChatInput
+                            onSubmit={submit}
+                            onCancel={cancel}
+                            disabled={isLoading}
+                            isLoading={isLoading}
+                        />
                     </div>
                 </div>
             ) : (
                 <div className={styles.chatArea}>
                     <div className={styles.messages}>
                         {messages.map((msg) => (
-                            <ChatBubble key={msg.id} role={msg.role} content={msg.content} />
+                            <ChatBubble
+                                key={msg.id}
+                                role={msg.role}
+                                content={msg.content}
+                            />
                         ))}
-                        {isExplaining && <ChatBubble role="ai" content="Thinking…" />}
+                        {isExplaining && (
+                            <ChatBubble role="ai" content="Thinking…" />
+                        )}
                         <div ref={bottomRef} />
                     </div>
                     <div className={styles.inputArea}>
-                       <ChatInput onSubmit={submit} onCancel={cancel} disabled={isLoading} isLoading={isLoading} />
+                        <ChatInput
+                            onSubmit={submit}
+                            onCancel={cancel}
+                            disabled={isLoading}
+                            isLoading={isLoading}
+                        />
                     </div>
                 </div>
             )}

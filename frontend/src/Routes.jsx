@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import NewChat from "./pages/NewChat/NewChat";
+import ChatHistory from "./pages/ChatHistory/ChatHistory";
 import Layout from "./components/Layout/Layout";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Auth from "./pages/Auth/Auth";
@@ -15,6 +16,22 @@ const AppRoutes = () => {
                     element={
                         <ProtectedRoute>
                             <NewChat />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="chat/:sessionId"
+                    element={
+                        <ProtectedRoute>
+                            <NewChat />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="chats"
+                    element={
+                        <ProtectedRoute>
+                            <ChatHistory />
                         </ProtectedRoute>
                     }
                 />
