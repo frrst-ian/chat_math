@@ -2,7 +2,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends
 from uuid import uuid4
 from store import jobs
 from services.manim_runner import run_manim, video_exists
-from services.llm import generate_explanation, classify_input
+from services.llm import generate_explanation, classify_input, generate_title
 from services.curriculum_alert import log_query
 from middleware.auth import verify_token
 from models.chat_model import ChatRequest
@@ -25,6 +25,12 @@ async def chat(payload: ChatRequest, background_tasks: BackgroundTasks, user=Dep
 @router.get("")
 def get_topics(user=Depends(verify_token)):
     return list(TOPICS.keys())
+
+@router.post("/title")
+async def get_title(payload: dict, user=Depends(verify_token)):
+    topic = payload.get("topic", "")
+    title = await asyncio.to_thread(generate_title, topic)
+    return {"title": title}
 
 async def run_job(job_id: str, topic: str, user_id: str, has_video: bool):
     try:

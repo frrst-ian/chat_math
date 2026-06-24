@@ -58,3 +58,9 @@ def get_recommendations() -> list[dict]:
                     "teacher_count": len(users),
                 })
     return recs
+
+def get_insights() -> list[dict]:
+    return [
+        {"competency": competency, "user_count": len(users)}
+        for competency, users in competency_users.items()
+    ]

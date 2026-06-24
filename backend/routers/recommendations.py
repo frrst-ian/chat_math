@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, BackgroundTasks
 from middleware.auth import verify_token
-from services.curriculum_alert import get_recommendations
+from services.curriculum_alert import get_recommendations, get_insights
 from services.manim_runner import run_manim, video_exists
 from store import jobs
 from uuid import uuid4
@@ -10,6 +10,10 @@ router = APIRouter(prefix="/api/recommendations", tags=["recommendations"])
 @router.get("")
 def list_recommendations(user=Depends(verify_token)):
     return get_recommendations()
+
+@router.get("/insights")
+def list_insights(user=Depends(verify_token)):
+    return get_insights()
 
 @router.post("/generate")
 async def generate_recommendation(

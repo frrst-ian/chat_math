@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { startChat, pollJob } from "../helpers/api";
+import { startChat, pollJob, generateSessionTitle } from "../helpers/api";
 import { useAuth } from "../context/AuthContext";
 import {
     createSession,
@@ -26,6 +26,7 @@ export function useChat() {
     const explanationAddedRef = useRef(false);
     const setModeRef = useRef(setMode);
     const userScrolledUpRef = useRef(false);
+    const pendingTopicRef = useRef(null);
     const { token } = useAuth();
 
     useEffect(() => {
@@ -36,15 +37,17 @@ export function useChat() {
         if (!sessionId) return;
         setSessionLoading(true);
         setCurrentSessionId(sessionId);
-        loadSession(sessionId).then((msgs) => {
-            setMessages(
-                msgs.map((m) => ({
-                    id: m.id,
-                    role: m.role,
-                    content: m.content,
-                })),
-            );
-        }).finally(() => setSessionLoading(false));
+        loadSession(sessionId)
+            .then((msgs) => {
+                setMessages(
+                    msgs.map((m) => ({
+                        id: m.id,
+                        role: m.role,
+                        content: m.content,
+                    })),
+                );
+            })
+            .finally(() => setSessionLoading(false));
     }, [sessionId]);
 
     const addMessage = useCallback(
@@ -72,17 +75,26 @@ export function useChat() {
                 navigate(`/chat/${sid}`, { replace: true });
             }
 
+            pendingTopicRef.current = { topic, sid };
             await addMessage("user", topic, sid);
             setStatus("pending");
             setIsExplaining(true);
             setVideoUrl(null);
-            userScrolledUpRef.current = false; // reset scroll lock on new submit
+            userScrolledUpRef.current = false;
 
             try {
-                const { job_id } = await startChat(topic.trim(), token, !!videoUrl);
+                const { job_id } = await startChat(
+                    topic.trim(),
+                    token,
+                    !!videoUrl,
+                );
                 setJobId(job_id);
             } catch {
-                await addMessage("ai", "Something went wrong. Please try again.", sid);
+                await addMessage(
+                    "ai",
+                    "Something went wrong. Please try again.",
+                    sid,
+                );
                 setStatus(null);
                 setIsExplaining(false);
             }
@@ -108,17 +120,40 @@ export function useChat() {
                 if (data.explanation && !explanationAddedRef.current) {
                     explanationAddedRef.current = true;
                     await addMessage("ai", data.explanation);
-                    await addMessage("hint", "Switch to Video Mode to watch the animation.");
+                    await addMessage(
+                        "hint",
+                        "Switch to Video Mode to watch the animation.",
+                    );
                     setIsExplaining(false);
+
+                    // Regenerate a smarter session title from the topic
+                    const pending = pendingTopicRef.current;
+                    if (pending) {
+                        generateSessionTitle(pending.topic, token)
+                            .then(({ title }) => {
+                                if (title)
+                                    updateSessionTitle(pending.sid, title);
+                            })
+                            .catch(() => {});
+                        pendingTopicRef.current = null;
+                    }
                 }
 
                 if (data.video_url) {
                     setVideoUrl(data.video_url);
                     toast(
                         (t) => (
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.75rem",
+                                }}
+                            >
                                 <Video size={16} strokeWidth={1.75} />
-                                <span style={{ fontSize: "0.875rem" }}>Animation is ready</span>
+                                <span style={{ fontSize: "0.875rem" }}>
+                                    Animation is ready
+                                </span>
                                 <button
                                     onClick={() => {
                                         setModeRef.current("video");
@@ -154,7 +189,10 @@ export function useChat() {
                 if (data.status === "done" || data.status === "failed") {
                     clearInterval(intervalRef.current);
                     if (data.status === "failed") {
-                        await addMessage("ai", "Couldn't generate the animation.");
+                        await addMessage(
+                            "ai",
+                            "Couldn't generate the animation.",
+                        );
                         setIsExplaining(false);
                         toast.error("Animation failed to render.", {
                             style: {

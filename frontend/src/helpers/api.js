@@ -33,3 +33,15 @@ export const generateRecommendation = (topic, token) =>
         headers: authHeaders(token),
         body: JSON.stringify({ topic }),
     }).then((r) => r.json());
+
+export const getInsights = (token) =>
+    fetch(`${BASE}/api/recommendations/insights`, {
+        headers: authHeaders(token),
+    }).then((r) => r.json());
+
+export const generateSessionTitle = (topic, token) =>
+    fetch(`${BASE}/api/chat/title`, {
+        method: "POST",
+        headers: authHeaders(token),
+        body: JSON.stringify({ topic }),
+    }).then((r) => r.json());

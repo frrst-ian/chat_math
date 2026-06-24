@@ -118,3 +118,65 @@
 .watchBtn:hover {
     background: var(--accent-2);
 }
+
+.tabs {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--background-2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 0.25rem;
+    width: fit-content;
+    margin-top: -1rem;
+}
+
+.tab {
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 0.875rem;
+    padding: 0.4rem 1rem;
+    border-radius: 7px;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        color 0.15s;
+}
+
+.tab:hover {
+    color: var(--text);
+}
+
+.tabActive {
+    background: #2b2d32;
+    color: var(--text);
+}
+
+.insightsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.insightRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--background-2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 0.85rem 1.25rem;
+}
+
+.insightLabel {
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+.insightCount {
+    font-size: 0.75rem;
+    background: var(--accent-2);
+    color: var(--primary);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+}
