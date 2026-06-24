@@ -1,4 +1,3 @@
-// frontend/src/hooks/useChat.js
 import { useState, useEffect, useRef, useCallback } from "react";
 import { startChat, pollJob } from "../helpers/api";
 import { useAuth } from "../context/AuthContext";
