@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Auth from "./pages/Auth/Auth";
 import Settings from "./pages/Settings/Settings";
 import Recommendations from "./pages/Recommendations/Recommendations";
+import NotFound from "./components/NotFound/NotFound";
 
 const AppRoutes = () => {
     return (
@@ -55,6 +56,7 @@ const AppRoutes = () => {
             </Route>
             <Route path="/auth" element={<Auth />} />
             <Route path="/" element={<Navigate to="/auth" replace />} />
+            <Route path="*" element={<NotFound />} />
         </Routes>
     );
 };

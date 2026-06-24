@@ -1,4 +1,3 @@
-// frontend/src/helpers/api.js
 const BASE = import.meta.env.VITE_API_URL ?? "";
 
 const authHeaders = (token) => ({
@@ -6,11 +5,11 @@ const authHeaders = (token) => ({
     Authorization: `Bearer ${token}`,
 });
 
-export const startChat = (topic, token) =>
+export const startChat = (topic, token, hasVideo = false) =>
     fetch(`${BASE}/api/chat`, {
         method: "POST",
         headers: authHeaders(token),
-        body: JSON.stringify({ topic }),
+        body: JSON.stringify({ topic, has_video: hasVideo }),
     }).then((r) => r.json());
 
 export const pollJob = (jobId, token) =>
@@ -26,11 +25,11 @@ export const getTopics = (token) =>
 export const getRecommendations = (token) =>
     fetch(`${BASE}/api/recommendations`, {
         headers: authHeaders(token),
-    }).then(r => r.json());
+    }).then((r) => r.json());
 
 export const generateRecommendation = (topic, token) =>
     fetch(`${BASE}/api/recommendations/generate`, {
         method: "POST",
         headers: authHeaders(token),
         body: JSON.stringify({ topic }),
-    }).then(r => r.json());
+    }).then((r) => r.json());

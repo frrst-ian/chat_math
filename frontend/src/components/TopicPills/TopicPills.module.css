@@ -14,7 +14,9 @@
     color: #fff;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
+    transition:
+        opacity 0.15s,
+        transform 0.1s;
     white-space: nowrap;
     min-height: 36px;
 }
@@ -26,6 +28,24 @@
 
 .pill:active {
     transform: translateY(0);
+}
+
+.pillSkeleton {
+    width: 100px;
+    height: 36px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.4;
+    }
 }
 
 @media (max-width: 480px) {

@@ -52,7 +52,7 @@
 
 .card {
     background: var(--background-2);
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
     padding: 1rem 1.25rem;
     display: flex;
@@ -68,7 +68,7 @@
 
 .ready {
     font-size: 0.75rem;
-    color: #4CAF82;
+    color: #4caf82;
 }
 
 .generating {
@@ -96,4 +96,25 @@
     gap: 0.5rem;
     color: #6b7280;
     font-size: 0.9rem;
+}
+
+.readyRow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.watchBtn {
+    font-size: 0.75rem;
+    background: none;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    padding: 0.3rem 0.65rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.watchBtn:hover {
+    background: var(--accent-2);
 }

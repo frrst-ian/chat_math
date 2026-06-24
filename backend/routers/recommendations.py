@@ -20,5 +20,12 @@ async def generate_recommendation(
     topic = payload["topic"]
     job_id = str(uuid4())
     jobs[job_id] = {"status": "pending", "video_url": None}
-    background_tasks.add_task(run_manim, topic)
+    background_tasks.add_task(_render_and_track, job_id, topic)
     return {"job_id": job_id}
+
+def _render_and_track(job_id: str, topic: str):
+    try:
+        video_path = run_manim(topic)
+        jobs[job_id].update({"status": "done", "video_url": f"/{video_path}"})
+    except Exception as e:
+        jobs[job_id].update({"status": "failed", "error": str(e)})

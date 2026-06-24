@@ -1,19 +1,34 @@
+import { useState, useEffect } from "react";
+import { getTopics } from "../../helpers/api";
+import { useAuth } from "../../context/AuthContext";
 import styles from "./TopicPills.module.css";
 
-const QUICK_TOPICS = [
-    {
-        label: "Number Line",
-        query: "Can you explain how the number line works?",
-    },
-    { label: "Sets", query: "I want to understand sets." },
-    { label: "Adding Fractions", query: "What is 1/2 + 1/3?" },
-    { label: "Linear Equations", query: "Solve 2x + 3 = 7. Show me first how it's solved graphically and then give me the solution mathematically." },
-];
-
 export default function TopicPills({ onSelect }) {
+    const [topics, setTopics] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { token } = useAuth();
+
+    useEffect(() => {
+        getTopics(token)
+            .then((data) => setTopics(Object.entries(data)))
+            .finally(() => setLoading(false));
+    }, [token]);
+
+    if (loading) {
+        return (
+            <div className={styles.pills}>
+                {Array(4)
+                    .fill(0)
+                    .map((_, i) => (
+                        <div key={i} className={styles.pillSkeleton} />
+                    ))}
+            </div>
+        );
+    }
+
     return (
         <div className={styles.pills}>
-            {QUICK_TOPICS.map(({ label, query }) => (
+            {topics.map(([label, query]) => (
                 <button
                     key={label}
                     className={styles.pill}

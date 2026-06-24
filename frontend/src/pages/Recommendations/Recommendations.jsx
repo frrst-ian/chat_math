@@ -4,12 +4,15 @@ import { getRecommendations, generateRecommendation } from "../../helpers/api";
 import styles from "./Recommendations.module.css";
 import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Recommendations() {
+    const { token } = useAuth();
+    const navigate = useNavigate();
+
     const [recs, setRecs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [generating, setGenerating] = useState({});
-    const { token } = useAuth();
 
     useEffect(() => {
         getRecommendations(token)
@@ -29,6 +32,10 @@ export default function Recommendations() {
                 setGenerating((prev) => ({ ...prev, [topic]: false }));
             }
         }, 5000);
+    };
+
+    const handleWatch = async (topic) => {
+        navigate(`/new-chat`, { state: { prefill: topic } });
     };
 
     return (
@@ -106,9 +113,19 @@ export default function Recommendations() {
                                             {rec.topic}
                                         </p>
                                         {rec.ready ? (
-                                            <span className={styles.ready}>
-                                                ✓ Ready
-                                            </span>
+                                            <div className={styles.readyRow}>
+                                                <span className={styles.ready}>
+                                                    ✓ Ready
+                                                </span>
+                                                <button
+                                                    className={styles.watchBtn}
+                                                    onClick={() =>
+                                                        handleWatch(rec.topic)
+                                                    }
+                                                >
+                                                    Open in Chat
+                                                </button>
+                                            </div>
                                         ) : generating[rec.topic] ? (
                                             <span className={styles.generating}>
                                                 Rendering...
