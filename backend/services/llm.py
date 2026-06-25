@@ -101,3 +101,13 @@ def _strip_fences(script: str) -> str:
     if script.endswith("```"):
         script = script.rsplit("\n", 1)[0]
     return script.strip()
+    
+def generate_title(topic: str) -> str:
+    response = litellm.completion(
+        model=os.getenv("LLM_MODEL"),
+        messages=[
+            {"role": "system", "content": "Generate a short chat title (max 5 words) for this math topic or question. Return only the title, nothing else."},
+            {"role": "user", "content": topic}
+        ],
+    )
+    return response.choices[0].message.content.strip()
